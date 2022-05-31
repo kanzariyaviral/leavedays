@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 import { Injectable } from '@nestjs/common';
 import * as moment from 'moment';
 
@@ -73,6 +74,84 @@ export class AppService {
         console.log(dates);
         const lastDay = dates.slice(-1);
         console.log(`last day of leave:-${lastDay}`);
+      }
+    }
+  }
+
+  getapi(data: any): any {
+    let { noOfLeaves, startDate, isSateurdayHoliday, isSundayHoliday } = data;
+    startDate = moment(new Date(startDate)).format('ddd,YYYY-MM-DD');
+    // return startDate;
+    // startDate = startDate.toDateString;
+    // eslint-disable-next-line prefer-const
+    let endDate: any = moment(startDate)
+      .add(noOfLeaves, 'days')
+      .format('ddd,YYYY-MM-DD');
+    const currentDate: Date = new Date();
+    const inputDate = new Date(startDate);
+
+    if (currentDate > inputDate) {
+      return 'Please Enter Valid Date';
+    } else {
+      if (!isSateurdayHoliday && !isSundayHoliday) {
+        const dates = [];
+        while (moment(startDate) < moment(endDate)) {
+          dates.push(startDate);
+          startDate = moment(startDate).add(1, 'days').format('ddd,YYYY-MM-DD');
+        }
+        // console.log(dates);
+        // console.log(`last day of leave:-${lastDay}`);
+        const lastDay = dates.slice(-1);
+        const result = { dates: dates, lastDay: lastDay };
+        return result;
+      } else if (isSateurdayHoliday && isSundayHoliday) {
+        const dates = [];
+        while (moment(startDate) < moment(endDate)) {
+          const day = moment(startDate).day();
+          if (day !== 6 && day !== 0) {
+            dates.push(startDate);
+          } else {
+            endDate = moment(endDate).add(1, 'days').format('ddd,YYYY-MM-DD');
+          }
+          startDate = moment(startDate).add(1, 'days').format('ddd,YYYY-MM-DD');
+        }
+        // console.log(dates);
+        // console.log(`last day of leave:-${lastDay}`);
+        const lastDay = dates.slice(-1);
+        const result = { dates: dates, lastDay: lastDay };
+        return result;
+      } else if (!isSateurdayHoliday && isSundayHoliday) {
+        const dates = [];
+        while (moment(startDate) < moment(endDate)) {
+          const day = moment(startDate).day();
+          if (day !== 0) {
+            dates.push(startDate);
+          } else {
+            endDate = moment(endDate).add(1, 'days').format('ddd,YYYY-MM-DD');
+          }
+          startDate = moment(startDate).add(1, 'days').format('ddd,YYYY-MM-DD');
+        }
+        // console.log(dates);
+        // console.log(`last day of leave:-${lastDay}`);
+        const lastDay = dates.slice(-1);
+        const result = { dates: dates, lastDay: lastDay };
+        return result;
+      } else if (isSateurdayHoliday && !isSundayHoliday) {
+        const dates = [];
+        while (moment(startDate) < moment(endDate)) {
+          const day = moment(startDate).day();
+          if (day !== 6) {
+            dates.push(startDate);
+          } else {
+            endDate = moment(endDate).add(1, 'days').format('ddd,YYYY-MM-DD');
+          }
+          startDate = moment(startDate).add(1, 'days').format('ddd,YYYY-MM-DD');
+        }
+        // console.log(dates);
+        // console.log(`last day of leave:-${lastDay}`);
+        const lastDay = dates.slice(-1);
+        const result = { dates: dates, lastDay: lastDay };
+        return result;
       }
     }
   }
