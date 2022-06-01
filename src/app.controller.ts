@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Get,
   Post,
   UsePipes,
   ValidationPipe,
@@ -13,13 +12,14 @@ import { countLeaveDayDto } from './countLeaveDay.Dto';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Post('api')
+  @Post('getleave')
   @UsePipes(ValidationPipe)
-  getapi(@Body() data: countLeaveDayDto): string {
-    return this.appService.getapi(data);
+  getleave(@Body() data: countLeaveDayDto) {
+    return this.appService.getLeave(data);
   }
-  @Get('getleave')
-  getleave() {
-    return this.appService.getLeave();
+  @Post('getleavess')
+  getholiday(@Body() data: any) {
+    const { startDate, holidays } = data;
+    return this.appService.checkHoliday(holidays, startDate);
   }
 }

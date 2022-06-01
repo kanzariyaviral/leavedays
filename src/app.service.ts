@@ -4,86 +4,15 @@ import * as moment from 'moment';
 
 @Injectable()
 export class AppService {
-  getHello(): any {
-    return 'yes';
-  }
-
-  getLeave(): any {
-    const noOfLeaves = 3;
-    let startDate = '2022-06-24';
+  async getLeave(data: any): Promise<any> {
+    let {
+      noOfLeaves,
+      startDate,
+      isSateurdayHoliday,
+      isSundayHoliday,
+      holidays,
+    } = data;
     startDate = moment(new Date(startDate)).format('ddd,YYYY-MM-DD');
-
-    let endDate: any = moment(startDate).add(noOfLeaves, 'days');
-    const isSateurdayHoliday = true;
-    const isSundayHoliday = false;
-
-    const currentDate: Date = new Date();
-    const inputDate = new Date(startDate);
-
-    if (currentDate > inputDate) {
-      console.log('Please Enter Valid Date');
-    } else {
-      if (!isSateurdayHoliday && !isSundayHoliday) {
-        const dates = [];
-        while (moment(startDate) < moment(endDate)) {
-          dates.push(startDate);
-          startDate = moment(startDate).add(1, 'days').format('ddd,YYYY-MM-DD');
-        }
-        console.log(dates);
-        const lastDay = dates.slice(-1);
-        console.log(`last day of leave:-${lastDay}`);
-      } else if (isSateurdayHoliday && isSundayHoliday) {
-        const dates = [];
-        while (moment(startDate) < moment(endDate)) {
-          const day = moment(startDate).day();
-          if (day !== 6 && day !== 0) {
-            dates.push(startDate);
-          } else {
-            endDate = moment(endDate).add(1, 'days').format('ddd,YYYY-MM-DD');
-          }
-          startDate = moment(startDate).add(1, 'days').format('ddd,YYYY-MM-DD');
-        }
-        console.log(dates);
-        const lastDay = dates.slice(-1);
-        console.log(`last day of leave:-${lastDay}`);
-      } else if (!isSateurdayHoliday && isSundayHoliday) {
-        const dates = [];
-        while (moment(startDate) < moment(endDate)) {
-          const day = moment(startDate).day();
-          if (day !== 0) {
-            dates.push(startDate);
-          } else {
-            endDate = moment(endDate).add(1, 'days').format('ddd,YYYY-MM-DD');
-          }
-          startDate = moment(startDate).add(1, 'days').format('ddd,YYYY-MM-DD');
-        }
-        console.log(dates);
-        const lastDay = dates.slice(-1);
-        console.log(`last day of leave:-${lastDay}`);
-      } else if (isSateurdayHoliday && !isSundayHoliday) {
-        const dates = [];
-        while (moment(startDate) < moment(endDate)) {
-          const day = moment(startDate).day();
-          if (day !== 6) {
-            dates.push(startDate);
-          } else {
-            endDate = moment(endDate).add(1, 'days').format('ddd,YYYY-MM-DD');
-          }
-          startDate = moment(startDate).add(1, 'days').format('ddd,YYYY-MM-DD');
-        }
-        console.log(dates);
-        const lastDay = dates.slice(-1);
-        console.log(`last day of leave:-${lastDay}`);
-      }
-    }
-  }
-
-  getapi(data: any): any {
-    let { noOfLeaves, startDate, isSateurdayHoliday, isSundayHoliday } = data;
-    startDate = moment(new Date(startDate)).format('ddd,YYYY-MM-DD');
-    // return startDate;
-    // startDate = startDate.toDateString;
-    // eslint-disable-next-line prefer-const
     let endDate: any = moment(startDate)
       .add(noOfLeaves, 'days')
       .format('ddd,YYYY-MM-DD');
@@ -91,68 +20,54 @@ export class AppService {
     const inputDate = new Date(startDate);
 
     if (currentDate > inputDate) {
-      return 'Please Enter Valid Date';
+      console.log('Please Enter Valid Date');
     } else {
-      if (!isSateurdayHoliday && !isSundayHoliday) {
-        const dates = [];
-        while (moment(startDate) < moment(endDate)) {
-          dates.push(startDate);
-          startDate = moment(startDate).add(1, 'days').format('ddd,YYYY-MM-DD');
-        }
-        // console.log(dates);
-        // console.log(`last day of leave:-${lastDay}`);
-        const lastDay = dates.slice(-1);
-        const result = { dates: dates, lastDay: lastDay };
-        return result;
-      } else if (isSateurdayHoliday && isSundayHoliday) {
-        const dates = [];
-        while (moment(startDate) < moment(endDate)) {
-          const day = moment(startDate).day();
-          if (day !== 6 && day !== 0) {
+      const dates = [];
+      while (moment(startDate) < moment(endDate)) {
+        const day = moment(startDate).day();
+        const isholiday = await this.checkHoliday(holidays, startDate);
+        if (isholiday == false) {
+          if (!isSateurdayHoliday && !isSundayHoliday) {
             dates.push(startDate);
-          } else {
-            endDate = moment(endDate).add(1, 'days').format('ddd,YYYY-MM-DD');
+          } else if (isSateurdayHoliday && isSundayHoliday) {
+            if (day != 6 && day != 0) {
+              dates.push(startDate);
+            } else {
+              endDate = moment(endDate).add(1, 'days').format('ddd,YYYY-MM-DD');
+            }
+          } else if (!isSateurdayHoliday && isSundayHoliday) {
+            if (day != 0) {
+              dates.push(startDate);
+            } else {
+              endDate = moment(endDate).add(1, 'days').format('ddd,YYYY-MM-DD');
+            }
+          } else if (isSateurdayHoliday && !isSundayHoliday) {
+            if (day != 6) {
+              dates.push(startDate);
+            } else {
+              endDate = moment(endDate).add(1, 'days').format('ddd,YYYY-MM-DD');
+            }
           }
-          startDate = moment(startDate).add(1, 'days').format('ddd,YYYY-MM-DD');
+        } else {
+          endDate = moment(endDate).add(1, 'days').format('ddd,YYYY-MM-DD');
         }
-        // console.log(dates);
-        // console.log(`last day of leave:-${lastDay}`);
-        const lastDay = dates.slice(-1);
-        const result = { dates: dates, lastDay: lastDay };
-        return result;
-      } else if (!isSateurdayHoliday && isSundayHoliday) {
-        const dates = [];
-        while (moment(startDate) < moment(endDate)) {
-          const day = moment(startDate).day();
-          if (day !== 0) {
-            dates.push(startDate);
-          } else {
-            endDate = moment(endDate).add(1, 'days').format('ddd,YYYY-MM-DD');
-          }
-          startDate = moment(startDate).add(1, 'days').format('ddd,YYYY-MM-DD');
-        }
-        // console.log(dates);
-        // console.log(`last day of leave:-${lastDay}`);
-        const lastDay = dates.slice(-1);
-        const result = { dates: dates, lastDay: lastDay };
-        return result;
-      } else if (isSateurdayHoliday && !isSundayHoliday) {
-        const dates = [];
-        while (moment(startDate) < moment(endDate)) {
-          const day = moment(startDate).day();
-          if (day !== 6) {
-            dates.push(startDate);
-          } else {
-            endDate = moment(endDate).add(1, 'days').format('ddd,YYYY-MM-DD');
-          }
-          startDate = moment(startDate).add(1, 'days').format('ddd,YYYY-MM-DD');
-        }
-        // console.log(dates);
-        // console.log(`last day of leave:-${lastDay}`);
-        const lastDay = dates.slice(-1);
-        const result = { dates: dates, lastDay: lastDay };
-        return result;
+        startDate = moment(startDate).add(1, 'days').format('ddd,YYYY-MM-DD');
       }
+      const lastDay = dates.slice(-1);
+      const result = { dates: dates, lastDay: lastDay };
+      return result;
     }
+  }
+  checkHoliday(holidays: any, startDate): any {
+    let Holidays = [];
+    Holidays = holidays;
+    let isholiday = false;
+    Array.from(Holidays).forEach((value) => {
+      let isSame = moment(startDate).isSame(moment(value));
+      if (isSame == true) {
+        isholiday = isSame;
+      }
+    });
+    return isholiday;
   }
 }
